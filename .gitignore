@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+.DS_Store
+.workflow-runs/
+.workflow-backups/
+.verification/
+.work/
+*.log
+node_modules/
+tools/dsh-codex-import/manifest.json
+tools/dsh-codex-import/.verification/
+.env
+.env.*
+!.env.example

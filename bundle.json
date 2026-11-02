@@ -1,0 +1,111 @@
+{
+  "name": "agent-workflows",
+  "version": "1.0.0",
+  "snapshot_date": "2026-11-02",
+  "default_installer": "scripts/install.py",
+  "default_install_group": "core",
+  "optional_plugin": "optional/superpowers",
+  "skills": [
+    {
+      "name": "codex-tiered-workflow",
+      "path": ".agents/skills/codex-tiered-workflow",
+      "group": "core"
+    },
+    {
+      "name": "humanizer",
+      "path": ".agents/skills/humanizer",
+      "group": "core"
+    },
+    {
+      "name": "humanizer-zh",
+      "path": ".agents/skills/humanizer-zh",
+      "group": "core"
+    },
+    {
+      "name": "project-corrections",
+      "path": ".agents/skills/project-corrections",
+      "group": "core"
+    },
+    {
+      "name": "brainstorming",
+      "path": "optional/superpowers/skills/brainstorming",
+      "group": "optional"
+    },
+    {
+      "name": "diagnosing-superpowers",
+      "path": "optional/superpowers/skills/diagnosing-superpowers",
+      "group": "optional"
+    },
+    {
+      "name": "dispatching-parallel-agents",
+      "path": "optional/superpowers/skills/dispatching-parallel-agents",
+      "group": "optional"
+    },
+    {
+      "name": "executing-plans",
+      "path": "optional/superpowers/skills/executing-plans",
+      "group": "optional"
+    },
+    {
+      "name": "finishing-a-development-branch",
+      "path": "optional/superpowers/skills/finishing-a-development-branch",
+      "group": "optional"
+    },
+    {
+      "name": "receiving-code-review",
+      "path": "optional/superpowers/skills/receiving-code-review",
+      "group": "optional"
+    },
+    {
+      "name": "requesting-code-review",
+      "path": "optional/superpowers/skills/requesting-code-review",
+      "group": "optional"
+    },
+    {
+      "name": "subagent-driven-development",
+      "path": "optional/superpowers/skills/subagent-driven-development",
+      "group": "optional"
+    },
+    {
+      "name": "systematic-debugging",
+      "path": "optional/superpowers/skills/systematic-debugging",
+      "group": "optional"
+    },
+    {
+      "name": "test-driven-development",
+      "path": "optional/superpowers/skills/test-driven-development",
+      "group": "optional"
+    },
+    {
+      "name": "using-git-worktrees",
+      "path": "optional/superpowers/skills/using-git-worktrees",
+      "group": "optional"
+    },
+    {
+      "name": "using-superpowers",
+      "path": "optional/superpowers/skills/using-superpowers",
+      "group": "optional"
+    },
+    {
+      "name": "verification-before-completion",
+      "path": "optional/superpowers/skills/verification-before-completion",
+      "group": "optional"
+    },
+    {
+      "name": "writing-plans",
+      "path": "optional/superpowers/skills/writing-plans",
+      "group": "optional"
+    },
+    {
+      "name": "writing-skills",
+      "path": "optional/superpowers/skills/writing-skills",
+      "group": "optional"
+    }
+  ],
+  "agents_templates": {
+    "global": "templates/global.AGENTS.md",
+    "project": "templates/project.AGENTS.md"
+  },
+  "corrections": "docs/corrections/index.md",
+  "offline_check": "scripts/check.py"
+}

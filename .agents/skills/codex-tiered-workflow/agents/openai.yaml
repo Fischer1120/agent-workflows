@@ -1,0 +1,7 @@
+interface:
+  display_name: "Codex 与 DSH 分层协作"
+  short_description: "Sol 统筹；多模态禁用 DSH，可选 Terra，非多模态速度优先由 DSH 验收"
+  default_prompt: "使用 $codex-tiered-workflow 先核对任务模态，多模态任务不交 DSH；派发时可考虑 Terra，非多模态速度优先由 DSH 执行并独立验收，其他任务分层执行、Sol 验收，主动查询并补录实际问题。"
+
+policy:
+  allow_implicit_invocation: true

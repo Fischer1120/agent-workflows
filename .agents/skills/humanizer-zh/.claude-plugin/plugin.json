@@ -1,0 +1,5 @@
+{
+  "name": "humanizer-zh",
+  "description": "Remove signs of AI-generated, translated, or overly mechanical Chinese prose.",
+  "skills": ["./SKILL.md"]
+}

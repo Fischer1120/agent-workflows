@@ -1,0 +1,6 @@
+interface:
+  display_name: "问题记录与方案查询"
+  short_description: "遇到问题先查已有方案，最终独立检查主动补录问题与处理办法，并说明记录变更"
+  default_prompt: "使用 $project-corrections 先查询已有方案，在最终独立检查中查找本次实际问题及解决办法，同步记录与索引，并在完成简报列明新增或更新内容。"
+policy:
+  allow_implicit_invocation: true

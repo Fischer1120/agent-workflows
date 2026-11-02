@@ -1,0 +1,5 @@
+# Generated per machine; contains absolute local paths.
+manifest.json
+.verification/
+__pycache__/
+*.py[cod]

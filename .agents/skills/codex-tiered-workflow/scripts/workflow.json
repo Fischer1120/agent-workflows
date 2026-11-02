@@ -1,0 +1,13 @@
+{
+  "dsh_model": null,
+  "dsh_model_name": null,
+  "dsh_reasoning_effort": null,
+  "dsh_default_source": "Select a model from dispatch.py discover on the deployment machine",
+  "luna_model": "gpt-6-luna",
+  "luna_effort": "max",
+  "luna_service_tier": "fast",
+  "coordinator": "gpt-6.1-sol",
+  "coordinator_effort": "xhigh",
+  "final_reviewer": "gpt-6.1-sol",
+  "dsh_provider": null
+}
