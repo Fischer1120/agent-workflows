@@ -1,4 +1,4 @@
-"""Run a bounded Luna task through the installed Codex app-server protocol."""
+"""Run a bounded low-end fast task through the installed Codex app-server protocol."""
 from __future__ import annotations
 
 import json
@@ -95,7 +95,7 @@ def run(job_dir: Path):
             'model': 'gpt-6-luna', 'serviceTier': 'fast', 'cwd': job['cwd'],
             'sandbox': job['sandbox'], 'approvalPolicy': 'on-request',
             'ephemeral': True,
-            'developerInstructions': '你是 Sol 分派的 Luna 执行者。只完成给定简报，不重新分流、不启动子代理或 dsh。需要新权限或业务判断时停止并回报。',
+            'developerInstructions': '你是低端快速档执行者，接受旗舰档主模型的分派。只完成给定简报，不重新分流、不启动子代理或 dsh。需要新权限或业务判断时停止并回报。',
             'config': {'model_reasoning_effort': 'max', 'features.multi_agent': False,
                        'features.fast_mode': True}})
         actual = {key: response.get(key) for key in
@@ -130,10 +130,10 @@ def run(job_dir: Path):
             msg = server.pending.pop(0) if server.pending else server.receive(deadline)
             if 'id' in msg and 'method' in msg:
                 # No approval or user-input channel exists in this detached worker.
-                # End the worker and leave the decision with the Sol parent.
+                # End the worker and leave the decision with the dispatching parent.
                 state['status'] = 'needs_attention'
                 state['request_method'] = msg['method']
-                state['error'] = '子任务需要权限或用户输入，请由 Sol 接回处理'
+                state['error'] = '子任务需要权限或用户输入，请由派发的旗舰档接回处理'
                 break
             method, params = msg.get('method'), msg.get('params', {})
             if params.get('threadId') not in (None, state['thread_id']):

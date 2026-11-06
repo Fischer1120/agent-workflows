@@ -2,7 +2,7 @@
 
 | 源工作流内容 | 公开版位置或替代入口 |
 | --- | --- |
-| 已安装的 codex-tiered-workflow 技能、元数据、派发器、Bridge 和 Luna worker | `.agents/skills/codex-tiered-workflow/` |
+| 已安装的 codex-tiered-workflow 技能、元数据、派发器、Bridge 和低端档 worker（`luna_worker.py`） | `.agents/skills/codex-tiered-workflow/` |
 | project-corrections 技能及元数据 | `.agents/skills/project-corrections/` |
 | 全局 AGENTS.md | `templates/global.AGENTS.md` |
 | 项目 AGENTS.md | 根 `AGENTS.md` 和 `templates/project.AGENTS.md` |

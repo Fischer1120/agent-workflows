@@ -33,6 +33,8 @@ Codex 的全局与项目指令、技能目录约定参考 [官方自定义说明
 
 ## 配置 DSH 与派发
 
+工作流按模型档位分工，模型名只是参考实现。旗舰档（`gpt-6.1-sol`、Claude Opus、Gemini 4 等）负责需求与验收标准、任务分解、前端设计和关键决策；中等复杂度、边界明确、要求快速处理的非多模态任务交给 DSH；简单、重复、可独立核验的快速任务交给低端档（`gpt-6-luna` 固定 `max` 并启用 Fast、Claude Haiku 等）；原生中坚子代理（`gpt-6.1-terra`）可选；攻坚档用于旗舰档明确无法解决的十分复杂问题，尽量少用。多模态任务不交给 DSH 或低端档。
+
 先启动 DSH Desktop，再运行已安装技能的 `scripts/dispatch.py discover`。从结果中选取实际启用模型的 `selectionId`，通过 `--dsh-model` 保存，或在每次派发时显式传入。
 
 下面示例从已安装项目根目录运行：
@@ -47,7 +49,18 @@ python3 .agents/skills/codex-tiered-workflow/scripts/dispatch.py status \
 
 等待同一任务真正完成，读取 `result.txt` 和必要产物后再开展依赖工作。`idle` 不表示完成，`needs_attention` 不表示失败，投递状态不确定时先查同一会话。等待期间只处理无依赖且文件不重叠的工作。
 
-Luna 使用 `--backend luna`，运行入口会核实服务端接受指定模型、`max` 和 Fast 后才开始任务。Terra 和 Astra 走宿主的原生子代理入口，派发器没有这两个 backend。
+低端档用 `--backend luna` 派发，这是参考实现；运行入口会核实服务端接受指定模型、`max` 和 Fast 后才开始任务。原生中坚子代理和攻坚档走宿主的原生子代理入口，派发器没有这两个 backend。
+
+任务已经在 DSH 会话里发起时，省去 `scripts/dispatch.py` 的跨进程派发，直接用当前会话的原生子代理分派有界子任务。原本给低端档的简单快速任务合并到 DeepSeek 处理；其他宿主没有可用低端档位时同样合并。需要跨进程回执、状态查询或给其他宿主留验收记录时仍用派发脚本。
+
+用户明确要求速度优先的非多模态任务，从外部宿主用 `--speed-priority` 派发，验收阶段加 `--phase review` 并保持只读：
+
+```sh
+python3 .agents/skills/codex-tiered-workflow/scripts/dispatch.py submit --speed-priority --phase execute --cwd "/absolute/project" --task-title "速度优先执行" --brief-file "/absolute/execute-brief.txt" --sandbox workspace-write
+python3 .agents/skills/codex-tiered-workflow/scripts/dispatch.py submit --speed-priority --phase review --cwd "/absolute/project" --task-title "DSH 独立验收" --brief-file "/absolute/review-brief.txt" --sandbox read-only
+```
+
+成品由未参与实现的另一个 DSH 会话或独立 DSH 子代理只读验收。DSH 内发起的同类任务直接在会话内完成，不再绕回派发脚本。
 
 DSH 技能共享是独立的可选步骤，按 [适配器说明](../tools/dsh-codex-import/README.md) 生成本机清单并安装。清单含本机绝对路径，保持在本地。
 

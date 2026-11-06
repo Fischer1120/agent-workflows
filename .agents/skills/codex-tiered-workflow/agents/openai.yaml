@@ -1,7 +1,7 @@
 interface:
-  display_name: "Codex 与 DSH 分层协作"
-  short_description: "Sol 统筹；多模态禁用 DSH，可选 Terra，非多模态速度优先由 DSH 验收"
-  default_prompt: "使用 $codex-tiered-workflow 先核对任务模态，多模态任务不交 DSH；派发时可考虑 Terra，非多模态速度优先由 DSH 执行并独立验收，其他任务分层执行、Sol 验收，主动查询并补录实际问题。"
+  display_name: "分层档位协作"
+  short_description: "旗舰档统筹；中等快任务交 DSH DeepSeek，简单快任务交低端档；DSH 内省去派发脚本"
+  default_prompt: "使用 $codex-tiered-workflow 先判断模态与复杂度：多模态任务不交 DSH，旗舰型工作留在主窗口，中等复杂度的非多模态任务交给 DSH（DeepSeek），简单快速任务交给低端档；任务原本在 DSH 发起时省去派发脚本，宿主没有低端档位时把低成本任务合并到 DeepSeek，并主动查询与补录实际问题。"
 
 policy:
   allow_implicit_invocation: true

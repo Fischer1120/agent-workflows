@@ -1,8 +1,8 @@
+"""Tests for speed-priority dispatch and DSH independent review markers."""
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / ".agents/skills/codex-tiered-workflow/scripts"))
 
-"""Tests for speed-priority dispatch and DSH independent review markers."""
 import argparse
 import contextlib
 import io
@@ -96,7 +96,7 @@ class DispatchSubmitTests(unittest.TestCase):
         prompt = self.read_prompt(result)
         self.assertIn('另一 DSH 会话独立验收', prompt)
         self.assertIn('未参与实现', prompt)
-        self.assertNotIn('由 Sol 独立验收', prompt)
+        self.assertNotIn('由未参与实现的旗舰档子代理独立验收', prompt)
         submits = [call for call in self.calls if call[0] == 'submit']
         self.assertEqual(len(submits), 1)
         self.assertEqual(submits[0][1], job['session_id'])
@@ -110,9 +110,9 @@ class DispatchSubmitTests(unittest.TestCase):
         self.assertEqual(job['final_reviewer'], 'gpt-6.1-sol')
         expected = (f'Codex 项目：测试项目\n子任务：测试子任务\n'
                     f'共享项目目录：{self.project}\n'
-                    '你接受 Sol 6.1 的任务分派，只执行这份简报，不启动其他模型或重新分配任务。'
+                    '你接受旗舰档主模型的任务分派，只执行这份简报，不启动其他模型或重新分配任务。'
                     '保留用户与其他执行者的修改。只操作简报允许的文件；需要新权限或关键判断时停止并回报。'
-                    '完成后给出结果、实际文件路径、验证证据和未解决事项，由 Sol 独立验收。\n\n'
+                    '完成后给出结果、实际文件路径、验证证据和未解决事项，由未参与实现的旗舰档子代理独立验收。\n\n'
                     '完成任务。')
         self.assertEqual(self.read_prompt(result), expected)
         self.assertEqual(result['final_reviewer'], 'gpt-6.1-sol')
@@ -125,10 +125,18 @@ class DispatchSubmitTests(unittest.TestCase):
         self.assertEqual(job['backend'], 'luna')
         self.assertIs(job['speed_priority'], False)
         self.assertEqual(job['final_reviewer'], 'gpt-6.1-sol')
-        self.assertIn('由 Sol 独立验收', self.read_prompt(result))
+        self.assertIn('由未参与实现的旗舰档子代理独立验收', self.read_prompt(result))
         self.assertEqual([call for call in self.calls if call[0] == 'submit'], [])
         self.assertEqual(popen.call_count, 1)
         self.assertIn('_luna-worker', popen.call_args.args[0])
+
+    def test_luna_multimodal_is_rejected_before_worker_starts(self):
+        with mock.patch.object(dispatch.subprocess, 'Popen') as popen:
+            with self.assertRaisesRegex(ValueError, '交回旗舰档'):
+                self.run_submit(self.args(backend='luna', multimodal=True))
+        popen.assert_not_called()
+        self.assertEqual(self.calls, [])
+        self.assertFalse(self.runs.exists())
 
     def test_speed_priority_luna_is_rejected_before_any_backend_call(self):
         with self.assertRaises(ValueError):
@@ -138,7 +146,7 @@ class DispatchSubmitTests(unittest.TestCase):
 
     def test_ordinary_dsh_multimodal_is_rejected_before_read_or_backend(self):
         with mock.patch.object(dispatch.subprocess, 'Popen') as popen:
-            with self.assertRaisesRegex(ValueError, '交回 Sol'):
+            with self.assertRaisesRegex(ValueError, '交回旗舰档'):
                 self.run_submit(self.args(multimodal=True, brief_file=str(self.root / 'missing')))
         self.assertEqual(self.calls, [])
         popen.assert_not_called()
@@ -148,7 +156,7 @@ class DispatchSubmitTests(unittest.TestCase):
         with mock.patch.object(dispatch.subprocess, 'Popen') as popen:
             for phase in ('execute', 'review'):
                 with self.subTest(phase=phase):
-                    with self.assertRaisesRegex(ValueError, '交回 Sol'):
+                    with self.assertRaisesRegex(ValueError, '交回旗舰档'):
                         self.run_submit(self.args(backend=None, speed_priority=True,
                                                   phase=phase, multimodal=True,
                                                   brief_file=str(self.root / 'missing')))
@@ -163,7 +171,7 @@ class DispatchSubmitTests(unittest.TestCase):
              '--task-title', '测试', '--brief-file', str(self.root / 'missing'),
              '--runs-dir', str(self.runs)], capture_output=True, text=True)
         self.assertEqual(result.returncode, 1)
-        self.assertIn('交回 Sol', json.loads(result.stderr)['error'])
+        self.assertIn('交回旗舰档', json.loads(result.stderr)['error'])
         self.assertFalse(self.runs.exists())
 
     def test_review_without_speed_priority_is_rejected(self):
@@ -192,9 +200,9 @@ class DispatchSubmitTests(unittest.TestCase):
         prompt = self.read_prompt(result)
         self.assertIn('通过/不通过', prompt)
         self.assertIn('不修改文件', prompt)
-        self.assertIn('不追加 Sol/Luna 复核', prompt)
+        self.assertIn('不追加旗舰档或低端档复核', prompt)
         self.assertNotIn('Sol 独立验收', prompt)
-        self.assertNotIn('由 Sol 独立验收', prompt)
+        self.assertNotIn('由未参与实现的旗舰档子代理独立验收', prompt)
 
     def test_two_submits_use_independent_sessions_without_history(self):
         first = self.run_submit(self.args(backend=None, speed_priority=True))
@@ -210,7 +218,7 @@ class DispatchSubmitTests(unittest.TestCase):
         self.assertNotEqual(submits[0][1], submits[1][1])
         second_prompt = self.read_prompt(second)
         self.assertNotIn(first['job_id'], second_prompt)
-        self.assertNotIn('Sol 独立验收', second_prompt)
+        self.assertNotIn('旗舰档子代理独立验收', second_prompt)
 
     def test_legacy_cli_backend_form_still_works(self):
         argv = ['dispatch.py', 'submit', '--backend', 'dsh', '--cwd', str(self.project),

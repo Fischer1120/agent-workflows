@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Dispatch explicit Sol assignments to DSH or to Luna max/Fast."""
+"""Dispatch main-model assignments to DSH (DeepSeek) or to a low-end fast model."""
 from __future__ import annotations
 
 import argparse
@@ -39,7 +39,7 @@ def resolve_backend(args) -> str:
             return 'dsh'
         raise ValueError('普通任务必须显式指定 --backend（dsh 或 luna）')
     if speed_priority and backend == 'luna':
-        raise ValueError('速度优先任务只能派发给 DSH，不支持 Luna')
+        raise ValueError('速度优先任务只能派发给 DSH；低端快速档不支持速度优先')
     return backend
 
 
@@ -63,18 +63,18 @@ def build_prompt(title: str, task_title: str, cwd: Path, brief: str,
             f'共享项目目录：{cwd}\n')
     if phase == 'review':
         return (base +
-                '你接受 Sol 6.1 的任务分派，只执行这份独立验收简报，不启动其他模型或重新分配任务，'
+                '你接受旗舰档主模型的任务分派，只执行这份独立验收简报，不启动其他模型或重新分配任务，'
                 '也不自动派发后续任务。只依据成品和任务要求进行独立验收，不修改文件；'
-                '给出通过/不通过结论和必要证据。不追加 Sol/Luna 复核。\n\n' + brief)
-    header = base + '你接受 Sol 6.1 的任务分派，只执行这份简报，不启动其他模型或重新分配任务。'
+                '给出通过/不通过结论和必要证据。不追加旗舰档或低端档复核。\n\n' + brief)
+    header = base + '你接受旗舰档主模型的任务分派，只执行这份简报，不启动其他模型或重新分配任务。'
     if speed_priority:
         return (header +
                 '保留用户与其他执行者的修改。只操作简报允许的文件；需要新权限或关键判断时停止并回报。'
                 '完成后给出结果、实际文件路径、验证证据和未解决事项，交给未参与实现的另一 DSH 会话独立验收，'
-                '不再要求 Sol 验收。\n\n' + brief)
+                '不再要求旗舰档复核。\n\n' + brief)
     return (header +
             '保留用户与其他执行者的修改。只操作简报允许的文件；需要新权限或关键判断时停止并回报。'
-            '完成后给出结果、实际文件路径、验证证据和未解决事项，由 Sol 独立验收。\n\n' + brief)
+            '完成后给出结果、实际文件路径、验证证据和未解决事项，由未参与实现的旗舰档子代理独立验收。\n\n' + brief)
 
 
 def summary(job_dir: Path) -> dict:
@@ -118,8 +118,10 @@ def refresh_dsh(job_dir: Path) -> dict:
 
 def submit(args):
     backend = resolve_backend(args)
-    if getattr(args, 'multimodal', False) and backend == 'dsh':
-        raise ValueError('多模态任务不能派发给 DSH；请交回 Sol 选择支持所需模态的原生执行者')
+    if getattr(args, 'multimodal', False):
+        raise ValueError(
+            '多模态任务不能派发给 DSH 或低端档；请交回旗舰档选择支持所需模态的原生执行者'
+        )
     validate_phase(args, backend)
     speed_priority = bool(getattr(args, 'speed_priority', False))
     phase = getattr(args, 'phase', 'execute')
@@ -185,11 +187,12 @@ def main():
     sub = parser.add_subparsers(dest='command', required=True)
     p = sub.add_parser('submit')
     p.add_argument('--backend', choices=['dsh', 'luna'],
-                   help='速度优先可省略（默认 dsh）；普通任务必须显式指定')
+                   help='速度优先可省略（默认 dsh）；普通任务必须显式指定。'
+                        '任务已在 DSH 内发起时可省去本脚本，直接用原生子代理')
     p.add_argument('--speed-priority', action='store_true',
-                   help='速度优先：默认派发 DSH，由未参与实现的另一 DSH 会话独立验收')
+                   help='速度优先：默认派发 DSH（DeepSeek），由未参与实现的另一 DSH 会话独立验收')
     p.add_argument('--multimodal', action='store_true',
-                   help='任务需要实际图片、音频、视频或视觉判断；不能派发给 DSH')
+                   help='任务需要实际图片、音频、视频或视觉判断；不能派发给 DSH 或低端档')
     p.add_argument('--phase', choices=['execute', 'review'], default='execute',
                    help='review 仅允许速度优先 + DSH + read-only')
     p.add_argument('--cwd', default=str(Path.cwd()))
