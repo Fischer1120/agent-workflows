@@ -152,7 +152,7 @@ DSH 适配器的默认应用路径面向 macOS，其他安装位置可通过环�
 python3 scripts/check.py
 ```
 
-检查包括公开文件扫描、技能包校验，以及 **80 项 Python 测试**。已安装 DSH 依赖时，还可运行 **26 项 Node 测试**：
+检查包括公开文件扫描、技能包校验，以及 **81 项 Python 测试**。已安装 DSH 依赖时，还可运行 **26 项 Node 测试**：
 
 ```sh
 node --test tools/dsh-codex-import/test_provider.mjs \
